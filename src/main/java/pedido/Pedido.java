@@ -1,6 +1,10 @@
 package pedido;
 
+import ingredientes.Adicional;
+import produto.TipoTamanho;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class Pedido{
 
@@ -28,7 +32,30 @@ public class Pedido{
 
     public double calcularTotal(Cardapio cardapio){
         double total= 0;
-        //TODO
+        for (ItemPedido itemPedido : itens) {
+            var base = itemPedido.getShake().getBase();
+            var precoBase = cardapio.buscarPreco(base);
+            var tamanho = itemPedido.getShake().getTipoTamanho();
+
+            if (tamanho == TipoTamanho.P) {
+                total += precoBase * itemPedido.getQuantidade();
+            } else if (tamanho == TipoTamanho.M) {
+                total += (precoBase * 1.3) * itemPedido.getQuantidade();
+            } else {
+                total += (precoBase * 1.5) * itemPedido.getQuantidade();
+            }
+        }
+        return total+= this.calcularAdicionais(cardapio);
+    }
+
+    public double calcularAdicionais(Cardapio cardapio) {
+        double total = 0;
+        for (ItemPedido itemPedido : itens) {
+            List<Adicional> adicionais = itemPedido.getShake().getAdicionais();
+            for (Adicional adicional : adicionais) {
+                total += cardapio.buscarPreco(adicional) * itemPedido.getQuantidade();
+            }
+        }
         return total;
     }
 

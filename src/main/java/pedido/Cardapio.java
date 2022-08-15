@@ -16,7 +16,7 @@ public class Cardapio {
     }
 
     public void adicionarIngrediente(Ingrediente ingrediente,Double preco){
-        //TODO
+            precos.put(ingrediente, preco);
     }
 
     public boolean atualizarIngrediente(Ingrediente ingrediente,Double preco){
@@ -30,8 +30,14 @@ public class Cardapio {
     }
 
     public Double buscarPreco(Ingrediente ingrediente){
-        //TODO
-        return 0.0;
+        verificarSeIgredienteExiste(ingrediente);
+        return precos.get(ingrediente);
+    }
+
+    public void verificarSeIgredienteExiste(Ingrediente ingrediente) {
+        if (!precos.containsKey(ingrediente)) {
+            throw new IllegalArgumentException("Ingrediente nao existe no cardapio.");
+        }
     }
 
     @Override
