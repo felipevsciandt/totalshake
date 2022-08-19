@@ -13,7 +13,7 @@ public class Armazem {
     }
 
     public void cadastrarIngredienteEmEstoque(Ingrediente ingrediente) {
-        if (!estoque.containsKey(ingrediente)) {
+        if (!existeIngrediente(ingrediente)) {
             estoque.put(ingrediente, 0);
         } else {
             throw new IllegalArgumentException("Ingrediente já cadastrado.");
@@ -21,11 +21,15 @@ public class Armazem {
     }
 
     public void descadastrarIngredienteEmEstoque(Ingrediente ingrediente) {
-
+        if (existeIngrediente(ingrediente)) {
+            estoque.remove(ingrediente);
+        } else {
+            throw new IllegalArgumentException("Ingrediente não encontrado");
+        }
     }
 
     public void adicionarQuantidadeDoIngredienteEmEstoque(Ingrediente ingrediente, Integer quantidade) {
-        if (estoque.containsKey(ingrediente)) {
+        if (existeIngrediente(ingrediente)) {
             estoque.put(ingrediente, quantidade);
         } else {
             throw new IllegalArgumentException("Ingrediente não encontrado");
@@ -37,11 +41,15 @@ public class Armazem {
     }
 
     public int consultarQuantidadeDoIngredienteEmEstoque(Ingrediente ingrediente) {
-        if (estoque.containsKey(ingrediente)) {
+        if (existeIngrediente(ingrediente)) {
             return estoque.get(ingrediente);
         } else {
             throw new IllegalArgumentException("Ingrediente não encontrado");
         }
+    }
+
+    public boolean existeIngrediente(Ingrediente ingrediente) {
+        return estoque.containsKey(ingrediente);
     }
 
 

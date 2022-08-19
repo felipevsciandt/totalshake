@@ -16,25 +16,25 @@ class ArmazemTest extends Armazem {
 
     static Armazem armazem;
     static Base baseSorvete;
+    static Base baseIorgute;
 
     @BeforeAll
     void setupBase() {
         baseSorvete = new Base(TipoBase.Sorvete);
     }
 
-
     @BeforeEach
     void setup() {
         armazem = new Armazem();
         baseSorvete = new Base(TipoBase.Sorvete);
+        baseIorgute = new Base(TipoBase.Iorgute);
     }
-
 
     @Test
     void testCadastrarIngredienteEmEstoque() {
         armazem.cadastrarIngredienteEmEstoque(baseSorvete);
-        int quantidade = armazem.consultarQuantidadeDoIngredienteEmEstoque(baseSorvete);
-        assertEquals(0, quantidade);
+        int quantidadeEmEstoque = armazem.consultarQuantidadeDoIngredienteEmEstoque(baseSorvete);
+        assertEquals(0, quantidadeEmEstoque);
 
         IllegalArgumentException thrown = assertThrows(
                 IllegalArgumentException.class,
@@ -45,6 +45,16 @@ class ArmazemTest extends Armazem {
 
     @Test
     void testDescadastrarIngredienteEmEstoque() {
+        armazem.cadastrarIngredienteEmEstoque(baseSorvete);
+        armazem.descadastrarIngredienteEmEstoque(baseSorvete);
+        assertFalse(armazem.existeIngrediente(baseSorvete));
+
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> armazem.descadastrarIngredienteEmEstoque(baseSorvete)
+        );
+        assertTrue(thrown.getMessage().contains("Ingrediente não encontrado"));
+
     }
 
     @Test
@@ -60,6 +70,14 @@ class ArmazemTest extends Armazem {
         armazem.cadastrarIngredienteEmEstoque(baseSorvete);
         armazem.adicionarQuantidadeDoIngredienteEmEstoque(baseSorvete, 1);
         assertEquals(1,armazem.consultarQuantidadeDoIngredienteEmEstoque(baseSorvete));
+
+        armazem.descadastrarIngredienteEmEstoque(baseSorvete);
+
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> armazem.consultarQuantidadeDoIngredienteEmEstoque(baseSorvete)
+        );
+        assertTrue(thrown.getMessage().contains("Ingrediente não encontrado"));
 
     }
 }
