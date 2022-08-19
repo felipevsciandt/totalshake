@@ -29,14 +29,33 @@ public class Armazem {
     }
 
     public void adicionarQuantidadeDoIngredienteEmEstoque(Ingrediente ingrediente, Integer quantidade) {
-        if (existeIngrediente(ingrediente)) {
-            estoque.put(ingrediente, quantidade);
+        if (existeIngrediente(ingrediente) && quantidadeASerAlteradaIngredienteValida(quantidade)) {
+            int estoqueAtual = consultarQuantidadeDoIngredienteEmEstoque(ingrediente);
+            estoque.put(ingrediente, quantidade + estoqueAtual);
+        } else if (!quantidadeASerAlteradaIngredienteValida(quantidade)) {
+            throw new IllegalArgumentException("Quantidade invalida");
         } else {
             throw new IllegalArgumentException("Ingrediente não encontrado");
         }
     }
 
     public void reduzirQuantidadeDoIngredienteEmEstoque(Ingrediente ingrediente, Integer quantidade) {
+        if (quantidade <= 0) {
+            throw new IllegalArgumentException("Quantidade inválida");
+        } else {
+            if (estoque.containsKey(ingrediente)) {
+                var estoqueAtual = consultarQuantidadeDoIngredienteEmEstoque(ingrediente) - quantidade;
+                if (estoqueAtual < 0) {
+                    throw new IllegalArgumentException("Quantidade inválida");
+                } else if (estoqueAtual == 0) {
+                    estoque.remove(ingrediente);
+                } else if (estoqueAtual > 0) {
+                    estoque.replace(ingrediente, estoque.get(ingrediente) - quantidade);
+                }
+            } else {
+                throw new IllegalArgumentException("Ingrediente não encontrado");
+            }
+        }
 
     }
 
@@ -49,9 +68,16 @@ public class Armazem {
     }
 
     public boolean existeIngrediente(Ingrediente ingrediente) {
-        return estoque.containsKey(ingrediente);
+        if (estoque.containsKey(ingrediente)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
+    public boolean quantidadeASerAlteradaIngredienteValida(int quantidade) {
+        return quantidade > 0;
+    }
 
 
 }

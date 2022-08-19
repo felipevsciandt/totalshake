@@ -16,7 +16,6 @@ class ArmazemTest extends Armazem {
 
     static Armazem armazem;
     static Base baseSorvete;
-    static Base baseIorgute;
 
     @BeforeAll
     void setupBase() {
@@ -27,13 +26,13 @@ class ArmazemTest extends Armazem {
     void setup() {
         armazem = new Armazem();
         baseSorvete = new Base(TipoBase.Sorvete);
-        baseIorgute = new Base(TipoBase.Iorgute);
     }
 
     @Test
     void testCadastrarIngredienteEmEstoque() {
         armazem.cadastrarIngredienteEmEstoque(baseSorvete);
         int quantidadeEmEstoque = armazem.consultarQuantidadeDoIngredienteEmEstoque(baseSorvete);
+
         assertEquals(0, quantidadeEmEstoque);
 
         IllegalArgumentException thrown = assertThrows(
@@ -47,6 +46,7 @@ class ArmazemTest extends Armazem {
     void testDescadastrarIngredienteEmEstoque() {
         armazem.cadastrarIngredienteEmEstoque(baseSorvete);
         armazem.descadastrarIngredienteEmEstoque(baseSorvete);
+
         assertFalse(armazem.existeIngrediente(baseSorvete));
 
         IllegalArgumentException thrown = assertThrows(
@@ -59,10 +59,57 @@ class ArmazemTest extends Armazem {
 
     @Test
     void testAdicionarQuantidadeDoIngredienteEmEstoque() {
+        armazem.cadastrarIngredienteEmEstoque(baseSorvete);
+        armazem.adicionarQuantidadeDoIngredienteEmEstoque(baseSorvete, 3);
+        armazem.adicionarQuantidadeDoIngredienteEmEstoque(baseSorvete, 2);
+
+        assertEquals(5, armazem.consultarQuantidadeDoIngredienteEmEstoque(baseSorvete));
+
+        IllegalArgumentException thrownError = assertThrows(
+                IllegalArgumentException.class,
+                () -> armazem.adicionarQuantidadeDoIngredienteEmEstoque(baseSorvete, -10)
+        );
+        assertTrue(thrownError.getMessage().contains("Quantidade invalida"));
+
+        armazem.descadastrarIngredienteEmEstoque(baseSorvete);
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> armazem.adicionarQuantidadeDoIngredienteEmEstoque(baseSorvete, 3)
+        );
+        assertTrue(thrown.getMessage().contains("Ingrediente não encontrado"));
+
     }
 
     @Test
     void testReduzirQuantidadeDoIngredienteEmEstoque() {
+        // REDUZINDO QTDE
+        armazem.cadastrarIngredienteEmEstoque(baseSorvete);
+        armazem.adicionarQuantidadeDoIngredienteEmEstoque(baseSorvete, 5);
+        armazem.reduzirQuantidadeDoIngredienteEmEstoque(baseSorvete, 2);
+        assertEquals(3, armazem.consultarQuantidadeDoIngredienteEmEstoque(baseSorvete));
+
+        // QTDE = 0
+        armazem.reduzirQuantidadeDoIngredienteEmEstoque(baseSorvete, 3);
+        assertFalse(existeIngrediente(baseSorvete));
+
+        // QTDE INVALIDA
+        armazem.cadastrarIngredienteEmEstoque(baseSorvete);
+        armazem.adicionarQuantidadeDoIngredienteEmEstoque(baseSorvete, 5);
+        System.out.println(armazem.consultarQuantidadeDoIngredienteEmEstoque(baseSorvete));
+        IllegalArgumentException thrownNegativeStock = assertThrows(
+                IllegalArgumentException.class,
+                () -> armazem.reduzirQuantidadeDoIngredienteEmEstoque(baseSorvete, 7)
+        );
+        assertTrue(thrownNegativeStock.getMessage().contains("Quantidade inválida"));
+
+        // Sem cadastro
+        armazem.descadastrarIngredienteEmEstoque(baseSorvete);
+        IllegalArgumentException thrownIngredientNotFound = assertThrows(
+                IllegalArgumentException.class,
+                () -> armazem.reduzirQuantidadeDoIngredienteEmEstoque(baseSorvete, 2)
+        );
+        assertTrue(thrownIngredientNotFound.getMessage().contains("Ingrediente não encontrado"));
+
     }
 
     @Test
